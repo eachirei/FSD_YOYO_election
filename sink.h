@@ -6,6 +6,7 @@
 #define FSD_SINK_H
 
 #include "utils.h"
+#include "comms.h"
 
 void sink(
         const MPI_Comm newComm,

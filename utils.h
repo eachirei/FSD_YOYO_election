@@ -30,56 +30,15 @@ void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const 
                      const int *inConnections, const int rank,
                      const int *neighbors);
 
-void simpleBroadcast(
-        const MPI_Comm newComm,
-        const int currentRank,
-        const int neighCount,
-        const int *neighbors,
-        const int *outConnections,
-        const int *message,
-        const int messageTag,
-        const int type
-);
 
-void complexBroadcast(
-        const MPI_Comm newComm,
-        const int currentRank,
-        const int neighCount,
-        const int *neighbors,
-        const int *connections,
-        const int *message,
-        const int messageTag
-);
 
-void complexMultiBroadcast(
-        const MPI_Comm newComm,
-        const int currentRank,
-        const int neighCount,
-        const int *neighbors,
-        const int *connections,
-        const int *valuesArr,
-        const int *prunesArr,
-        const int messageTag
-);
 
-void simpleGather(
-        const MPI_Comm newComm,
-        const int neighCount,
-        const int *neighbors,
-        const int *connections,
-        int *valuesArr,
-        const int messageTag
-);
 
-void complexGather(
-        const MPI_Comm newComm,
-        const int neighCount,
-        const int *neighbors,
-        const int *connections,
-        int *valuesArr,
-        int *prunesArr,
-        const int messageTag
-);
+
+
+
+
+
 
 int reduceArrayAND(
         const int *arr,

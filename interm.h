@@ -6,6 +6,7 @@
 #define FSD_INTERM_H
 
 #include "utils.h"
+#include "comms.h"
 
 void interm(
         const MPI_Comm newComm,

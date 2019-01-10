@@ -6,6 +6,7 @@
 #define FSD_SOURCE_H
 
 #include "utils.h"
+#include "comms.h"
 
 int source(
         const MPI_Comm newComm,
