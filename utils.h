@@ -121,7 +121,17 @@ void prepareOKValues(
         const int *inConnections,
         const int *recvValues,
         const int min,
+        const int passForwardYO,
         int *OKValues
+);
+
+void preparePruneNode(
+        const int neighCount,
+        const int *outConnCount,
+        const int *inConnCount,
+        const int *inConnections,
+        int *prunesArr,
+        int* DEAD
 );
 
 #endif //FSD_UTILS_H

@@ -61,7 +61,7 @@ void sink(
     int *OKValues = getUndefinedArray(neighCount);
     int *prunesArr = getUndefinedArray(neighCount);
 
-    prepareOKValues(neighCount, inConnections, recvValues, min, OKValues);
+    prepareOKValues(neighCount, inConnections, recvValues, min, TRUE, OKValues);
 
     preparePruneEdges(neighCount, inConnections, prunesArr, recvValues);
 
