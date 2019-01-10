@@ -55,7 +55,7 @@ void interm(
     int *recvValues = getUndefinedArray(neighCount);
     int *prunesArr = getUndefinedArray(neighCount);
 
-    complexGatherOutConnections(newComm, neighCount, neighbors, outConnections, recvValues, prunesArr, _YO);
+    complexGather(newComm, neighCount, neighbors, outConnections, recvValues, prunesArr, _YO);
 
 //    for (int i = 0; i < neighCount; i++) {
 //        if (!outConnections[i]) {

@@ -64,22 +64,22 @@ int main(int argc, char *argv[]) {
 
     int neighCount;
     MPI_Graph_neighbors_count(newComm, currentRank, &neighCount);
-    int *neighbors = (int *) malloc(neighCount * sizeof(int));
+    int *neighbors = getUndefinedArray(neighCount);
     MPI_Graph_neighbors(newComm, currentRank, neighCount, neighbors);
-    int *outConnections = (int *) malloc(neighCount * sizeof(int));
-    int *inConnections = (int *) malloc(neighCount * sizeof(int));
+    int *outConnections = getUndefinedArray(neighCount);
+    int *inConnections = getUndefinedArray(neighCount);
 
-    int INTERM, SOURCE, SINK, DEAD = 0;
+    int INTERM, SOURCE, SINK, DEAD = FALSE;
     int inConnCount = 0, outConnCount = 0;
 
     for (int i = 0; i < neighCount; i++) {
         if (neighbors[i] > currentRank) {
-            outConnections[i] = 1;
-            inConnections[i] = 0;
+            outConnections[i] = TRUE;
+            inConnections[i] = FALSE;
             outConnCount++;
         } else {
-            outConnections[i] = 0;
-            inConnections[i] = 1;
+            outConnections[i] = FALSE;
+            inConnections[i] = TRUE;
             inConnCount++;
         }
     }
@@ -95,7 +95,6 @@ int main(int argc, char *argv[]) {
         }
 
         computeNodeType(&SOURCE, &INTERM, &SINK, neighCount, outConnections, inConnections, currentRank, neighbors);
-//        printf("[%d]SOURCE: %d, INTERM: %d, SINK: %d\n", currentRank, SOURCE, INTERM, SINK);
 
         if (SOURCE) {
             if (source(newComm, numberOfProcesses, currentRank, neighCount, neighbors, &outConnCount, outConnections,

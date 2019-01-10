@@ -27,27 +27,30 @@ int source(
             &currentRank,
             YO_,
             SND);
+
+    // receive -yo
     // receive from out connections
-    int *valuesArr = getUndefinedArray(neighCount);
+
+    int *_YOValues = getUndefinedArray(neighCount);
     int *prunesArr = getUndefinedArray(neighCount);
 
-    complexGatherOutConnections(
+    complexGather(
             newComm,
             neighCount,
             neighbors,
             outConnections,
-            valuesArr,
+            _YOValues,
             prunesArr,
             _YO
     );
 
-    int recvOK = reduceArrayAND(valuesArr, neighCount);
+    int recvOK = reduceArrayAND(_YOValues, neighCount);
 
     processPrunes(neighCount, prunesArr, outConnCount, outConnections);
 
-    reverseEdges(neighCount, valuesArr, outConnCount, outConnections, inConnCount, inConnections);
+    reverseEdges(neighCount, _YOValues, outConnCount, outConnections, inConnCount, inConnections);
 
-    free(valuesArr);
+    free(_YOValues);
     free(prunesArr);
 
     if (recvOK && (*outConnCount) == 0) {

@@ -71,11 +71,11 @@ void simpleGather(
         const int messageTag
 );
 
-void complexGatherOutConnections(
+void complexGather(
         const MPI_Comm newComm,
         const int neighCount,
         const int *neighbors,
-        const int *outConnections,
+        const int *connections,
         int *valuesArr,
         int *prunesArr,
         const int messageTag

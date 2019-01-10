@@ -7,27 +7,27 @@
 void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const int *outConnections,
                      const int *inConnections, const int rank,
                      const int *neighbors) {
-    *SOURCE = 1;
-    *SINK = 1;
+    *SOURCE = TRUE;
+    *SINK = TRUE;
     if (rank == LOG_ID)
         printf("[%d]", rank);
     for (int i = 0; i < neighCount; i++) {
         if (outConnections[i]) {
             if (rank == LOG_ID)
                 printf("O%d,", neighbors[i]);
-            *SINK = 0;
+            *SINK = FALSE;
             continue;
         }
         if (inConnections[i]) {
             if (rank == LOG_ID)
                 printf("I%d,", neighbors[i]);
-            *SOURCE = 0;
+            *SOURCE = FALSE;
         }
     }
     if (rank == LOG_ID)
         printf("\n");
 
-    *INTERM = (*SOURCE == 0 && *SINK == 0);
+    *INTERM = (*SOURCE == FALSE && *SINK == FALSE);
 }
 
 void logSend(const int currentRank, const int destNeigh, const int messageTag) {
@@ -147,18 +147,18 @@ void simpleGather(
     }
 }
 
-void complexGatherOutConnections(
+void complexGather(
         const MPI_Comm newComm,
         const int neighCount,
         const int *neighbors,
-        const int *outConnections,
+        const int *connections,
         int *valuesArr,
         int *prunesArr,
         const int messageTag
 ) {
     MPI_Status status;
     for (int i = 0; i < neighCount; i++) {
-        if (outConnections[i] != TRUE) {
+        if (connections[i] != TRUE) {
             continue;
         }
         int recvNeigh = neighbors[i];
