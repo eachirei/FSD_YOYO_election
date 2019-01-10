@@ -4,30 +4,12 @@
 
 #include "utils.h"
 
-void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const int *outConnections,
-                     const int *inConnections, const int rank,
-                     const int *neighbors) {
-    *SOURCE = TRUE;
-    *SINK = TRUE;
-    if (rank == LOG_ID)
-        printf("[%d]", rank);
-    for (int i = 0; i < neighCount; i++) {
-        if (outConnections[i]) {
-            if (rank == LOG_ID)
-                printf("O%d,", neighbors[i]);
-            *SINK = FALSE;
-            continue;
-        }
-        if (inConnections[i]) {
-            if (rank == LOG_ID)
-                printf("I%d,", neighbors[i]);
-            *SOURCE = FALSE;
-        }
+int *getUndefinedArray(const int count) {
+    int *returnArr = (int *) malloc(count * sizeof(int));
+    for (int i = 0; i < count; i++) {
+        returnArr[i] = UNDEFINED;
     }
-    if (rank == LOG_ID)
-        printf("\n");
-
-    *INTERM = (*SOURCE == FALSE && *SINK == FALSE);
+    return returnArr;
 }
 
 int reduceArrayAND(
@@ -64,6 +46,39 @@ int reduceArrayMIN(
     return initial;
 }
 
+void computeNodeType(
+        int *SOURCE,
+        int *INTERM,
+        int *SINK,
+        int neighCount,
+        const int *outConnections,
+        const int *inConnections,
+        const int rank,
+        const int *neighbors
+) {
+    *SOURCE = TRUE;
+    *SINK = TRUE;
+    if (rank == LOG_ID)
+        printf("[%d]", rank);
+    for (int i = 0; i < neighCount; i++) {
+        if (outConnections[i]) {
+            if (rank == LOG_ID)
+                printf("O%d,", neighbors[i]);
+            *SINK = FALSE;
+            continue;
+        }
+        if (inConnections[i]) {
+            if (rank == LOG_ID)
+                printf("I%d,", neighbors[i]);
+            *SOURCE = FALSE;
+        }
+    }
+    if (rank == LOG_ID)
+        printf("\n");
+
+    *INTERM = (*SOURCE == FALSE && *SINK == FALSE);
+}
+
 void processPrunes(
         const int neighCount,
         const int *prunesArr,
@@ -94,14 +109,6 @@ void reverseEdges(
             *complemConnCount = *complemConnCount + 1;
         }
     }
-}
-
-int *getUndefinedArray(const int count) {
-    int *returnArr = (int *) malloc(count * sizeof(int));
-    for (int i = 0; i < count; i++) {
-        returnArr[i] = UNDEFINED;
-    }
-    return returnArr;
 }
 
 void preparePruneEdges(

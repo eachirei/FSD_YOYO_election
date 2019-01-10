@@ -26,19 +26,7 @@
 #define FALSE 0
 #define UNDEFINED -1
 
-void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const int *outConnections,
-                     const int *inConnections, const int rank,
-                     const int *neighbors);
-
-
-
-
-
-
-
-
-
-
+int *getUndefinedArray(const int count);
 
 int reduceArrayAND(
         const int *arr,
@@ -48,6 +36,17 @@ int reduceArrayAND(
 int reduceArrayMIN(
         const int *arr,
         const int count
+);
+
+void computeNodeType(
+        int *SOURCE,
+        int *INTERM,
+        int *SINK,
+        int neighCount,
+        const int *outConnections,
+        const int *inConnections,
+        const int rank,
+        const int *neighbors
 );
 
 void processPrunes(
@@ -66,7 +65,6 @@ void reverseEdges(
         int *complementaryConnections
 );
 
-int *getUndefinedArray(const int count);
 
 void preparePruneEdges(
         const int neighCount,
@@ -90,7 +88,7 @@ void preparePruneNode(
         const int *inConnCount,
         const int *inConnections,
         int *prunesArr,
-        int* DEAD
+        int *DEAD
 );
 
 #endif //FSD_UTILS_H

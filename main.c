@@ -94,23 +94,59 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        computeNodeType(&SOURCE, &INTERM, &SINK, neighCount, outConnections, inConnections, currentRank, neighbors);
+        computeNodeType(
+                &SOURCE,
+                &INTERM,
+                &SINK,
+                neighCount,
+                outConnections,
+                inConnections,
+                currentRank,
+                neighbors
+        );
 
         if (SOURCE) {
-            if (source(newComm, numberOfProcesses, currentRank, neighCount, neighbors, &outConnCount, outConnections,
-                       &inConnCount, inConnections) == FALSE) {
+            if (source(
+                    newComm,
+                    numberOfProcesses,
+                    currentRank,
+                    neighCount,
+                    neighbors,
+                    &outConnCount,
+                    outConnections,
+                    &inConnCount,
+                    inConnections
+            ) == FALSE) {
                 break;
             }
         }
 
         if (INTERM) {
-            interm(newComm, currentRank, neighCount, neighbors, &outConnCount, outConnections,
-                   &inConnCount, inConnections, &DEAD);
+            interm(
+                    newComm,
+                    currentRank,
+                    neighCount,
+                    neighbors,
+                    &outConnCount,
+                    outConnections,
+                    &inConnCount,
+                    inConnections,
+                    &DEAD
+            );
         }
 
         if (SINK) {
-            sink(newComm, currentRank, neighCount, neighbors, &outConnCount, outConnections,
-                 &inConnCount, inConnections, &DEAD);
+            sink(
+                    newComm,
+                    currentRank,
+                    neighCount,
+                    neighbors,
+                    &outConnCount,
+                    outConnections,
+                    &inConnCount,
+                    inConnections,
+                    &DEAD
+            );
         }
     }
 
