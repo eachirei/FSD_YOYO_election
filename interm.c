@@ -62,19 +62,21 @@ void interm(
 
     complexMultiBroadcast(newComm, currentRank, neighCount, neighbors, inConnections, OKValues, prunesArr, _YO);
 
+    free(prunesArr);
+
     // reverse edges if needed
     for (int i = 0; i < neighCount; i++) {
         // reverse out connections
         if (outConnections[i]) {
-            if (_YOValues[i] != 0) {
+            if (_YOValues[i] == TRUE) {
                 continue;
             }
             if (currentRank == LOG_ID) {
                 printf("[%d]Reversed edge %d\n", currentRank, neighbors[i]);
             }
-            inConnections[i] = 1;
+            inConnections[i] = TRUE;
             *inConnCount = *inConnCount + 1;
-            outConnections[i] = 0;
+            outConnections[i] = FALSE;
             *outConnCount = *outConnCount - 1;
             continue;
         }
@@ -87,9 +89,9 @@ void interm(
             if (currentRank == LOG_ID) {
                 printf("[%d]Reversed edge %d\n", currentRank, neighbors[i]);
             }
-            inConnections[i] = 0;
+            inConnections[i] = FALSE;
             *inConnCount = *inConnCount - 1;
-            outConnections[i] = 1;
+            outConnections[i] = TRUE;
             *outConnCount = *outConnCount + 1;
         }
     }

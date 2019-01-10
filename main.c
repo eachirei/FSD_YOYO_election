@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (SINK) {
-            sink(newComm, numberOfProcesses, currentRank, neighCount, neighbors, &outConnCount, outConnections,
+            sink(newComm, currentRank, neighCount, neighbors, &outConnCount, outConnections,
                  &inConnCount, inConnections, &DEAD);
         }
     }
