@@ -79,3 +79,74 @@ void broadcastOutConnections(
 
     }
 }
+
+void complexGatherOutConnections(
+        const MPI_Comm newComm,
+        const int neighCount,
+        const int *neighbors,
+        const int *outConnections,
+        int *valuesArr,
+        int *prunesArr,
+        const int messageTag
+) {
+    MPI_Status status;
+    for (int i = 0; i < neighCount; i++) {
+        if (!outConnections[i]) {
+            continue;
+        }
+        int recvNeigh = neighbors[i];
+        int *messagePacket = (int *) malloc(2 * sizeof(int));
+        MPI_Recv(messagePacket, 2, MPI_INT, recvNeigh, messageTag, newComm, &status);
+//                printf("[%d]Receive -YO from %d with <%d, %d>\n", currentRank, recvNeigh, messagePacket[0],
+//                       messagePacket[1]);
+        valuesArr[i] = messagePacket[0];
+        prunesArr[i] = messagePacket[1];
+        free(messagePacket);
+    }
+}
+
+int reduceArrayAND(
+        const int *arr,
+        const int count
+) {
+    int initial = arr[0];
+    for (int i = 1; i < count; i++) {
+        if (arr[i] == UNDEFINED) {
+            continue;
+        }
+        initial = initial & arr[i];
+    }
+    return initial;
+}
+
+void processPrunes(
+        const int neighCount,
+        const int *prunesArr,
+        int *outConnCount,
+        int *outConnections
+) {
+    for (int i = 0; i < neighCount; i++) {
+        if (prunesArr[i] == TRUE && outConnections[i] == TRUE) {
+            outConnections[i] = FALSE;
+            *outConnCount = *outConnCount - 1;
+        }
+    }
+}
+
+void reverseEdges(
+        const int neighCount,
+        const int *valuesArr,
+        int *outConnCount,
+        int *outConnections,
+        int *inConnCount,
+        int *inConnections
+) {
+    for (int i = 0; i < neighCount; i++) {
+        if (valuesArr[i] == FALSE && outConnections[i] == TRUE) {
+            outConnections[i] = FALSE;
+            *outConnCount = *outConnCount - 1;
+            inConnections[i] = TRUE;
+            *inConnCount = *inConnCount + 1;
+        }
+    }
+}

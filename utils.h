@@ -10,6 +10,7 @@
 #include "mpi.h"
 
 #define LOG_ID 5
+
 #define YO_ 100
 #define YO_S "YO-"
 #define _YO 101
@@ -22,6 +23,7 @@
 
 #define TRUE 1
 #define FALSE 0
+#define UNDEFINED -1
 
 void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const int *outConnections,
                      const int *inConnections, const int rank,
@@ -36,6 +38,37 @@ void broadcastOutConnections(
         const int *message,
         const int messageTag,
         const int type
+);
+
+void complexGatherOutConnections(
+        const MPI_Comm newComm,
+        const int neighCount,
+        const int *neighbors,
+        const int *outConnections,
+        int *valuesArr,
+        int *prunesArr,
+        const int messageTag
+);
+
+int reduceArrayAND(
+        const int *arr,
+        const int count
+);
+
+void processPrunes(
+        const int neighCount,
+        const int *prunesArr,
+        int *outConnCount,
+        int *outConnections
+);
+
+void reverseEdges(
+        const int neighCount,
+        const int *valuesArr,
+        int *outConnCount,
+        int *outConnections,
+        int *inConnCount,
+        int *inConnections
 );
 
 #endif //FSD_UTILS_H
