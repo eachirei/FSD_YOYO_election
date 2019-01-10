@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "mpi.h"
 
 #define LOG_ID 5
@@ -29,7 +30,7 @@ void computeNodeType(int *SOURCE, int *INTERM, int *SINK, int neighCount, const 
                      const int *inConnections, const int rank,
                      const int *neighbors);
 
-void broadcastOutConnections(
+void simpleBroadcast(
         const MPI_Comm newComm,
         const int currentRank,
         const int neighCount,
@@ -38,6 +39,36 @@ void broadcastOutConnections(
         const int *message,
         const int messageTag,
         const int type
+);
+
+void complexBroadcast(
+        const MPI_Comm newComm,
+        const int currentRank,
+        const int neighCount,
+        const int *neighbors,
+        const int *connections,
+        const int *message,
+        const int messageTag
+);
+
+void complexMultiBroadcast(
+        const MPI_Comm newComm,
+        const int currentRank,
+        const int neighCount,
+        const int *neighbors,
+        const int *connections,
+        const int *valuesArr,
+        const int *prunesArr,
+        const int messageTag
+);
+
+void simpleGather(
+        const MPI_Comm newComm,
+        const int neighCount,
+        const int *neighbors,
+        const int *connections,
+        int *valuesArr,
+        const int messageTag
 );
 
 void complexGatherOutConnections(
@@ -55,6 +86,11 @@ int reduceArrayAND(
         const int count
 );
 
+int reduceArrayMIN(
+        const int *arr,
+        const int count
+);
+
 void processPrunes(
         const int neighCount,
         const int *prunesArr,
@@ -65,10 +101,27 @@ void processPrunes(
 void reverseEdges(
         const int neighCount,
         const int *valuesArr,
-        int *outConnCount,
-        int *outConnections,
-        int *inConnCount,
-        int *inConnections
+        int *connToRevCount,
+        int *connToReverse,
+        int *complemConnCount,
+        int *complementaryConnections
+);
+
+int *getUndefinedArray(const int count);
+
+void preparePruneEdges(
+        const int neighCount,
+        int *inConnections,
+        int *prunesArr,
+        const int *minRecvValues
+);
+
+void prepareOKValues(
+        const int neighCount,
+        const int *inConnections,
+        const int *recvValues,
+        const int min,
+        int *OKValues
 );
 
 #endif //FSD_UTILS_H

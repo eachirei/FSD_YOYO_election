@@ -2,7 +2,6 @@
 // Created by Emanuel ACHIREI on 2019-01-09.
 //
 
-#include <string.h>
 #include "source.h"
 
 int source(
@@ -19,7 +18,7 @@ int source(
     // initiate yo-
     // send id through out connections
     printf("[%d]SOURCE\n", currentRank);
-    broadcastOutConnections(
+    simpleBroadcast(
             newComm,
             currentRank,
             neighCount,
@@ -29,10 +28,8 @@ int source(
             YO_,
             SND);
     // receive from out connections
-    int *valuesArr = (int *) malloc(neighCount * sizeof(int));
-    int *prunesArr = (int *) malloc(neighCount * sizeof(int));
-    memset(valuesArr, UNDEFINED, neighCount);
-    memset(prunesArr, UNDEFINED, neighCount);
+    int *valuesArr = getUndefinedArray(neighCount);
+    int *prunesArr = getUndefinedArray(neighCount);
 
     complexGatherOutConnections(
             newComm,
