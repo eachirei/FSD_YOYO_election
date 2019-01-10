@@ -7,7 +7,6 @@
 
 void interm(
         const MPI_Comm newComm,
-        const int numberOfProcesses,
         const int currentRank,
         const int neighCount,
         const int *neighbors,
@@ -17,28 +16,16 @@ void interm(
         int *inConnections,
         int *DEAD
 ) {
-    MPI_Status status;
     printf("[%d]INTERM\n", currentRank);
+    // yo- phase
     // receive id from in connections
     // compute min and pass through out connections
-//    int min = numberOfProcesses; // set as max as there cannot be a rank higher than the number of processes
-    int *minRecvValues = getUndefinedArray(neighCount);
+    int *YO_Values = getUndefinedArray(neighCount);
 
-    simpleGather(newComm, neighCount, neighbors, inConnections, minRecvValues, YO_);
+    simpleGather(newComm, neighCount, neighbors, inConnections, YO_Values, YO_);
 
-    int min = reduceArrayMIN(minRecvValues, neighCount);
+    int min = reduceArrayMIN(YO_Values, neighCount);
 
-//    for (int i = 0; i < neighCount; i++) {
-//        if (!inConnections[i]) {
-//            continue;
-//        }
-//        int recvNeigh = neighbors[i];
-//        MPI_Recv(&minRecvValues[i], 1, MPI_INT, recvNeigh, YO_, newComm, &status);
-////                printf("[%d]Receive YO- from %d value %d\n", currentRank, recvNeigh, minRecvValues[i]);
-//        if (min > minRecvValues[i]) {
-//            min = minRecvValues[i];
-//        }
-//    }
     simpleBroadcast(
             newComm,
             currentRank,
@@ -48,92 +35,38 @@ void interm(
             &min,
             YO_,
             FWD);
+
     // -yo phase
-    // receive values and reverse connections if needed
     // receive values from out connections
-//    int passForwardYO = 1;
-    int *recvValues = getUndefinedArray(neighCount);
+    int *_YOValues = getUndefinedArray(neighCount);
     int *prunesArr = getUndefinedArray(neighCount);
 
-    complexGather(newComm, neighCount, neighbors, outConnections, recvValues, prunesArr, _YO);
-
-//    for (int i = 0; i < neighCount; i++) {
-//        if (!outConnections[i]) {
-//            continue;
-//        }
-//        int recvNeigh = neighbors[i];
-//        int *messagePacket = (int *) malloc(2 * sizeof(int));
-//        MPI_Recv(messagePacket, 2, MPI_INT, recvNeigh, _YO, newComm, &status);
-//        recvValues[i] = messagePacket[0];
-//        passForwardYO = passForwardYO & recvValues[i];
-//        // prune if needed
-//        if (messagePacket[1]) {
-//            if (currentRank == LOG_ID) {
-//                printf("[%d]Pruned node %d\n", currentRank, neighbors[i]);
-//            }
-//            outConnections[i] = 0;
-//            *outConnCount = *outConnCount - 1;
-//        }
-//        free(messagePacket);
-//    }
+    complexGather(newComm, neighCount, neighbors, outConnections, _YOValues, prunesArr, _YO);
 
     processPrunes(neighCount, prunesArr, outConnCount, outConnections);
-    int passForwardYO = reduceArrayAND(recvValues, neighCount);
 
     free(prunesArr);
+
+    int passForwardYO = reduceArrayAND(_YOValues, neighCount);
 
     prunesArr = getUndefinedArray(neighCount);
 
     int *OKValues = getUndefinedArray(neighCount);
 
-    prepareOKValues(neighCount, inConnections, minRecvValues, min, passForwardYO, OKValues);
+    prepareOKValues(neighCount, inConnections, YO_Values, min, passForwardYO, OKValues);
 
-    preparePruneEdges(neighCount, inConnections, prunesArr, minRecvValues);
+    preparePruneEdges(neighCount, inConnections, prunesArr, YO_Values);
 
+    // preemptive pruning of node
     preparePruneNode(neighCount, outConnCount, inConnCount, inConnections, prunesArr, DEAD);
 
     complexMultiBroadcast(newComm, currentRank, neighCount, neighbors, inConnections, OKValues, prunesArr, _YO);
 
-//    int *messagePacket = (int *) malloc(2 * sizeof(int));
-//    // send values to in connections
-//    for (int i = 0; i < neighCount; i++) {
-//        if (!inConnections[i]) {
-//            continue;
-//        }
-//        messagePacket[0] = passForwardYO && minRecvValues[i] == min;
-//        // prune edges
-//        for (int j = i + 1; j < neighCount; j++) {
-//            if (!inConnections[j]) {
-//                continue;
-//            }
-//            if (minRecvValues[j] != minRecvValues[i]) {
-//                continue;
-//            }
-//            messagePacket[1] = 1; // prune flag
-//            MPI_Send(messagePacket, 2, MPI_INT, neighbors[j], _YO, newComm);
-//            printf("[%d]Forward -YO to %d values <%d,%d>\n", currentRank, neighbors[j], messagePacket[0],
-//                   messagePacket[1]);
-//            // prune edge
-//            inConnections[i] = 0;
-//            *inConnCount = *inConnCount - 1;
-//        }
-//        // preemeptive pruning
-//        messagePacket[1] = ((*outConnCount == 0) && *inConnCount == 1) ? 1 : 0;
-//        if (messagePacket[1]) {
-//            *DEAD = 1;
-//            if (currentRank == LOG_ID)
-//                printf("[%d]Preemptive pruning\n", currentRank);
-//        }
-//        int destNeigh = neighbors[i];
-//        MPI_Send(messagePacket, 2, MPI_INT, destNeigh, _YO, newComm);
-//        printf("[%d]Forward -YO to %d values <%d,%d>\n", currentRank, destNeigh, messagePacket[0],
-//               messagePacket[1]);
-//    }
     // reverse edges if needed
     for (int i = 0; i < neighCount; i++) {
         // reverse out connections
         if (outConnections[i]) {
-            if (recvValues[i] != 0) {
+            if (_YOValues[i] != 0) {
                 continue;
             }
             if (currentRank == LOG_ID) {
@@ -145,7 +78,11 @@ void interm(
             *outConnCount = *outConnCount - 1;
             continue;
         }
-        if (inConnections[i] && (!passForwardYO || minRecvValues[i] != min)) {
+        // the in connection is reversed if
+        // at least one NO was received in _YO phase
+        // or
+        // the minimum is different than the values received in yo- phase
+        if (inConnections[i] && (!passForwardYO || YO_Values[i] != min)) {
             // reverse in connections
             if (currentRank == LOG_ID) {
                 printf("[%d]Reversed edge %d\n", currentRank, neighbors[i]);
@@ -156,7 +93,6 @@ void interm(
             *outConnCount = *outConnCount + 1;
         }
     }
-//    free(messagePacket);
-    free(minRecvValues);
-    free(recvValues);
+    free(YO_Values);
+    free(_YOValues);
 }

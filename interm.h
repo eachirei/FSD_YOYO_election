@@ -9,7 +9,6 @@
 
 void interm(
         const MPI_Comm newComm,
-        const int numberOfProcesses,
         const int currentRank,
         const int neighCount,
         const int *neighbors,

@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (INTERM) {
-            interm(newComm, numberOfProcesses, currentRank, neighCount, neighbors, &outConnCount, outConnections,
+            interm(newComm, currentRank, neighCount, neighbors, &outConnCount, outConnections,
                    &inConnCount, inConnections, &DEAD);
         }
 
