@@ -53,8 +53,9 @@ void simpleBroadcast(
                 break;
             }
             case SND:
-            default:
+            default: {
                 logSend(currentRank, destNeigh, messageTag);
+            }
         }
     }
 }
@@ -88,18 +89,18 @@ void complexMultiBroadcast(
         const int *prunesArr,
         const int messageTag
 ) {
+    int *messagePacket = (int *) malloc(2 * sizeof(int));
     for (int i = 0; i < neighCount; i++) {
         if (connections[i] != TRUE) {
             continue;
         }
-        int *messagePacket = (int *) malloc(2 * sizeof(int));
         messagePacket[0] = valuesArr[i];
         messagePacket[1] = prunesArr[i];
         int destNeigh = neighbors[i];
         MPI_Send(messagePacket, 2, MPI_INT, destNeigh, messageTag, newComm);
         logComplex(currentRank, destNeigh, messageTag, messagePacket);
-        free(messagePacket);
     }
+    free(messagePacket);
 }
 
 void simpleGather(
@@ -130,16 +131,16 @@ void complexGather(
         const int messageTag
 ) {
     MPI_Status status;
+    int *messagePacket = (int *) malloc(2 * sizeof(int));
     for (int i = 0; i < neighCount; i++) {
         if (connections[i] != TRUE) {
             continue;
         }
         int recvNeigh = neighbors[i];
-        int *messagePacket = (int *) malloc(2 * sizeof(int));
         MPI_Recv(messagePacket, 2, MPI_INT, recvNeigh, messageTag, newComm, &status);
         valuesArr[i] = messagePacket[0];
         prunesArr[i] = messagePacket[1];
-        free(messagePacket);
     }
+    free(messagePacket);
 }
 

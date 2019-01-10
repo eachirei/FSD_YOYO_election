@@ -18,6 +18,10 @@ int reduceArrayAND(
 ) {
     int initial = arr[0];
     for (int i = 1; i < count; i++) {
+        // short-circuit
+        if (initial == FALSE) {
+            return initial;
+        }
         if (arr[i] == UNDEFINED) {
             continue;
         }
@@ -58,23 +62,27 @@ void computeNodeType(
 ) {
     *SOURCE = TRUE;
     *SINK = TRUE;
-    if (rank == LOG_ID)
+    if (rank == LOG_ID) {
         printf("[%d]", rank);
+    }
     for (int i = 0; i < neighCount; i++) {
         if (outConnections[i]) {
-            if (rank == LOG_ID)
+            if (rank == LOG_ID) {
                 printf("O%d,", neighbors[i]);
+            }
             *SINK = FALSE;
             continue;
         }
         if (inConnections[i]) {
-            if (rank == LOG_ID)
+            if (rank == LOG_ID) {
                 printf("I%d,", neighbors[i]);
+            }
             *SOURCE = FALSE;
         }
     }
-    if (rank == LOG_ID)
+    if (rank == LOG_ID) {
         printf("\n");
+    }
 
     *INTERM = (*SOURCE == FALSE && *SINK == FALSE);
 }
